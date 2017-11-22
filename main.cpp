@@ -1,7 +1,8 @@
+#include <windows.h>
 #include <stdio.h>
 #include <conio.h>
-#include <windows.h>
 #include <string.h>
+#include <time.h>
 #define MAX 100
 #define _C 1046.502
 #define _D 1108.731
@@ -10,11 +11,32 @@
 #define _G 1567.982
 #define _A 1760.000
 #define _B 1975.533
+
 void gotoxy(int x,int y){ /// 커서이동함수
     COORD pos= {x,y};
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),pos);
 }
-void LogIn(){ ///입력한 데이터가 userdatabase.dat파일에서 로드한 구조체배열에 있는지 검사
+
+struct LogForm{
+	char loghead[10];
+	char log[100];
+} structuredLog;
+
+void printLog(char Logheader[]){
+	FILE *forLog = fopen("Log.log","a");
+	if(forLog==NULL){
+        puts("NO LOGFILE~");
+        exit(1);
+	}
+	time_t now;
+    time(&now);
+	strcpy(structuredLog.loghead,Logheader);
+	strcpy(structuredLog.log,ctime(&now));
+	printf("%s %s",&structuredLog.loghead,&structuredLog.log);
+	fprintf(forLog,"%s %s",&structuredLog.loghead,&structuredLog.log);
+}
+
+void LogIn(){
 	puts("Free use!!\n");
 	Beep(_E, 500);
 	Beep(_D, 500);
@@ -161,6 +183,7 @@ void ChooseMode(){ /// 모드 선택
 			Beep(_F, 500);
 			Beep(_D, 500);
 			Beep(_C, 500);
+			remove("Buf.buf");
 			return;
 		}
 		else{
@@ -196,8 +219,9 @@ int main(){ ///메인함수
     system("cls"); ///전광판 삭제
     gotoxy(30,6);
 	system("cls");
-	puts("This TextEditor is made by Circler");
-	puts("       for UNIFOX project");
+	puts("This TextEditor is made by Circler"); // 내가 누군지 소개하는
+	puts("       for UNIFOX project");            // 왜 만들었는지 소개
+	printLog("Login_");
 	system("pause");
 	system("cls");
 	ChooseMode();
