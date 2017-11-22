@@ -34,6 +34,7 @@ void printLog(char Logheader[]){
 	strcpy(structuredLog.log,ctime(&now));
 	printf("%s %s",&structuredLog.loghead,&structuredLog.log);
 	fprintf(forLog,"%s %s",&structuredLog.loghead,&structuredLog.log);
+	fclose(forLog);
 }
 
 void LogIn(){
