@@ -230,8 +230,7 @@ int main(){ ///메인함수
     system("cls"); ///전광판 삭제
     gotoxy(30,6);
 	system("cls");
-	puts("This TextEditor is made by Circler"); // 내가 누군지 소개하는
-	puts("       for UNIFOX project");            // 왜 만들었는지 소개
+	puts("       for Project");            // 왜 만들었는지 소개
 	LogIn();
 	system("pause");
 	system("cls");
