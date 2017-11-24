@@ -18,7 +18,7 @@ void gotoxy(int x,int y){ /// 커서이동함수
 }
 
 struct LogForm{
-	char loghead[10];
+	char loghead[20];
 	char log[100];
 } structuredLog;
 
@@ -46,7 +46,9 @@ void LogIn(){
 	Beep(_D, 2000);
 	Sleep(1234);
 }
+
 void NewFile(){ /// 새로운 파일 만들기, 아무것도 입력안했을시 다시한번 입력하게 해야함
+	printLog("Into NewFile");
 	char FileContents[2048];
 	printf("%s",FileContents);
 	system("cls");
@@ -65,11 +67,14 @@ void NewFile(){ /// 새로운 파일 만들기, 아무것도 입력안했을시 
 	}while(1);
 	puts("");
 	printf("\nSaving~");
+	printLog("Make New File");
 	/// Sleep(5000);
 	system("pause");
 	fclose(f);
+	printLog("Outto NewFile");
 }
 void OpenText_View(){ /// 파일을 버퍼에 가지고 온 다음 출력
+	printLog("Into OpenText_View");
 	system("cls");
 	char FileName[32],buf[2048];
 	printf("Test.txt = Filename and Extension\nFilename : ");
@@ -82,8 +87,10 @@ void OpenText_View(){ /// 파일을 버퍼에 가지고 온 다음 출력
 	puts("");
 	system("pause");
 	fclose(f);
+	printLog("Outto OpenText_View");
 }
 void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역할을 하게 한다.)
+	printLog("Into OpenText_Modify");
 	system("cls");
 	char select,NowBuf;
 	char FileName[32],buf[3];
@@ -95,7 +102,7 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 		char select;
 		FILE *b=fopen("Buf.buf","w+");
 		puts("");
-		puts("if you %'`%' ,  break;");
+		puts("if you esc ,  break;");
 		puts("move: 1     write: 2     break: 3");
 		select=getch();
 		if(select=='1'){ /// 커서이동
@@ -119,7 +126,7 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 					case 's': fseek(f,10,SEEK_CUR); fp=ftell(f); break;
 					case 'a': fseek(f,-1,SEEK_CUR); fp=ftell(f); break;
 					case 'd': fseek(f,1,SEEK_CUR); fp=ftell(f); break;
-					case '`': SegFault='1'; break;
+					case 0x1b: SegFault='1'; break;
 					default : break;
 				}
 				if(SegFault=='1'){
@@ -130,8 +137,8 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 		else if(select=='2'){ ///삽입 텍스트 수정형식은 못함,,
 			char SegFault=0,Contents;
 			fseek(f,fp,SEEK_SET);  ///버퍼파일 생성준비
-			while(feof(f)=='\0'){/** 파일을 복사해서 버퍼역할을 하는 파일에 덮어쓴다 */
-				fgets(buf,sizeof(f),f);
+			while(fgets(buf,sizeof(f),f)/*feof(f)=='\0'*/){/** 파일을 복사해서 버퍼역할을 하는 파일에 덮어쓴다 */
+				//fgets(buf,sizeof(f),f);
 				fputs(buf,b);
 			}
 			rewind(f);
@@ -140,15 +147,15 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 				system("cls");
 				rewind(f);
 				rewind(b);
-				while(feof(f)=='\0'){
-					fgets(buf,sizeof(f),f);
+				while(/*feof(f)=='\0'*/fgets(buf,sizeof(f),f)){
+					//fgets(buf,sizeof(f),f);
 					printf("%s",buf);
 				}
 				fseek(f,fp,SEEK_SET);
 				puts("");
 				Contents=getch();
 				switch(Contents){
-					case '`': SegFault='1'; break;
+					case 0x1b : SegFault='1'; break;
 					case '~': fprintf(f,"\n"); break;
 					default :  fprintf(f,"%c",Contents); fp=ftell(f); bp++; while(feof(b)=='\0'){ fgets(buf,sizeof(b),b); fputs(buf,f); }
 				}
@@ -159,12 +166,14 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 			}
 		}
 		else if(select=='3'){
+			printLog("Outto OpenText_Modify");
 			return;
 		}
 	}
 }
 void ChooseMode(){ /// 모드 선택
 	char Mode;
+	printLog("Into ChooseMode");
 	while(1){
 		system("cls");
 		puts("Choose Mode");
@@ -185,6 +194,7 @@ void ChooseMode(){ /// 모드 선택
 			Beep(_D, 500);
 			Beep(_C, 500);
 			remove("Buf.buf");
+			printLog("Logout~");
 			return;
 		}
 		else{
@@ -222,9 +232,10 @@ int main(){ ///메인함수
 	system("cls");
 	puts("This TextEditor is made by Circler"); // 내가 누군지 소개하는
 	puts("       for UNIFOX project");            // 왜 만들었는지 소개
-	printLog("Login_");
+	LogIn();
 	system("pause");
 	system("cls");
 	ChooseMode();
+	remove("Buf.buf");
     return 0;
 }
