@@ -3,7 +3,8 @@
 #include <conio.h>
 #include <string.h>
 #include <time.h>
-#define MAX 100
+#include <io.h>
+
 #define _C 1046.502
 #define _D 1108.731
 #define _E 1318.510
@@ -11,14 +12,15 @@
 #define _G 1567.982
 #define _A 1760.000
 #define _B 1975.533
-
+void Top_of_the_FILE(){
+}
 void gotoxy(int x,int y){ /// 커서이동함수
     COORD pos= {x,y};
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),pos);
 }
 
 struct LogForm{
-	char loghead[20];
+	char loghead[40];
 	char log[100];
 } structuredLog;
 
@@ -32,7 +34,6 @@ void printLog(char Logheader[]){
     time(&now);
 	strcpy(structuredLog.loghead,Logheader);
 	strcpy(structuredLog.log,ctime(&now));
-	printf("%s %s",&structuredLog.loghead,&structuredLog.log);
 	fprintf(forLog,"%s %s",&structuredLog.loghead,&structuredLog.log);
 	fclose(forLog);
 }
@@ -48,13 +49,30 @@ void LogIn(){
 }
 
 void NewFile(){ /// 새로운 파일 만들기, 아무것도 입력안했을시 다시한번 입력하게 해야함
+	system("cls");
 	printLog("Into NewFile");
 	char FileContents[2048];
-	printf("%s",FileContents);
-	system("cls");
 	char FileName[32];
+	//printf("%s",FileContents);
 	printf("Ex)Test.txt = Filename and Extension\nFilename : ");
 	gets(FileName);
+
+
+	FILE *chk_f=fopen(FileName,"r");
+	if(chk_f!=NULL){
+		system("cls");
+		puts("already existence");
+		system("pause");
+		fclose(chk_f);
+		return ;
+	}
+	else{
+		fclose(chk_f);
+	}
+
+
+
+	system("cls");
 	FILE *f=fopen(FileName,"w");
 	printf("\tFileContents, If you want finish, Enter & Press \"EOF\"\n");
 	do{
@@ -79,9 +97,23 @@ void OpenText_View(){ /// 파일을 버퍼에 가지고 온 다음 출력
 	char FileName[32],buf[2048];
 	printf("Test.txt = Filename and Extension\nFilename : ");
 	gets(FileName);
+
+
+	FILE *chk_f=fopen(FileName,"r");
+	if(chk_f==NULL){
+		system("cls");
+		puts("No file");
+		system("pause");
+		fclose(chk_f);
+		return ;
+	}
+	else{
+		fclose(chk_f);
+	}
 	FILE *f=fopen(FileName,"r");
-	while(feof(f)=='\0'){
-		fgets(buf,sizeof(f),f);
+	
+	
+	while(fgets(buf,2,f)){
 		printf("%s",buf);
 	}
 	puts("");
@@ -97,6 +129,23 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 	long int fp=0,bp=0;
 	printf("Test.txt = Filename and Extension\nFilename : ");
 	gets(FileName);
+
+
+	FILE *chk_f=fopen(FileName,"r");
+	if(chk_f==NULL){
+		system("cls");
+		puts("No file");
+		system("pause");
+		fclose(chk_f);
+		return ;
+	}
+	else{
+		fclose(chk_f);
+	}
+
+
+
+
 	FILE *f=fopen(FileName,"r+");
 	while(1){
 		char select;
@@ -110,8 +159,7 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 			while(1){
 				system("cls");
 				rewind(f);
-				while(feof(f)=='\0'){
-					fgets(buf,/*sizeof(f)*/3,f);
+				while(fgets(buf,/*sizeof(f)*/3,f)){
 					printf("%s",buf);
 				}
 				puts("");
@@ -157,7 +205,8 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 				switch(Contents){
 					case 0x1b : SegFault='1'; break;
 					case '~': fprintf(f,"\n"); break;
-					default :  fprintf(f,"%c",Contents); fp=ftell(f); bp++; while(feof(b)=='\0'){ fgets(buf,sizeof(b),b); fputs(buf,f); }
+					case 0x0a: fprintf(f,"\n"); break;
+					default :  fprintf(f,"%c",Contents); fp=ftell(f); bp++; while(fgets(buf,sizeof(b),b)){  fputs(buf,f); }
 				}
 				if(SegFault=='1'){
 					remove("Buf.buf");
@@ -171,13 +220,57 @@ void OpenText_Modify(){ ///파일수정 (임시파일을 만들어서 버퍼역�
 		}
 	}
 }
+void removeFile(){
+	system("cls");
+	printLog("Into removeFile");
+	char FileName[32];
+	char temp[60]="Remove FILE : ";
+	puts("Enter the File Name");
+	gets(FileName);
+	FILE *chk_f=fopen(FileName,"r");
+	if(chk_f==NULL){
+		system("cls");
+		puts("No File");
+		system("pause");
+		fclose(chk_f);
+		return ;
+	}
+	else{
+		fclose(chk_f);
+	}
+	system("cls");
+	strcpy(temp,FileName);
+	remove(FileName);
+	printLog(temp);
+	printLog("Outto removeFile");
+}
+void listingFolder(){
+	printLog("listing Folder");
+	system("cls");
+	_finddata_t fd;
+    long handle;
+    int result = 1;
+    handle = _findfirst(".\\*.*", &fd);  //현재 폴더 내 모든 파일을 찾는다.
+  
+    if (handle == -1){
+        printf("There were no files.\n");
+        return;
+    }
+  
+    while (result != -1){
+        printf("File: %s\n", fd.name);
+        result = _findnext(handle, &fd);
+    }
+    _findclose(handle);
+	system("pause");
+}
 void ChooseMode(){ /// 모드 선택
 	char Mode;
 	printLog("Into ChooseMode");
 	while(1){
 		system("cls");
 		puts("Choose Mode");
-		printf("New Text File : 1\nOpen Text File_View : 2\nOpen Text File_Modify : 3\nEND : 4");
+		printf("New Text File : 1\nOpen Text File_View : 2\nOpen Text File_Modify : 3\nRemove File : 4\nListing Folder : 5\nEND : 6");
 		Mode=getch();
 		if(Mode=='1'){
 			NewFile();
@@ -189,6 +282,12 @@ void ChooseMode(){ /// 모드 선택
 			OpenText_Modify();
 		}
 		else if(Mode=='4'){
+			removeFile();
+		}
+		else if(Mode=='5'){
+			listingFolder();
+		}
+		else if(Mode=='6'){
 			Beep(_A, 500);
 			Beep(_F, 500);
 			Beep(_D, 500);
