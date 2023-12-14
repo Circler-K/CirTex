@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1511694859 source:c:\users\goen\documents\mygit\cirtex\main.cpp
+	<windows.h>
+	<stdio.h>
+	<conio.h>
+	<string.h>
+	<time.h>
+	<io.h>
+
